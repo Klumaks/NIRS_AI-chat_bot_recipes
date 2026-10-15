@@ -31,6 +31,7 @@ export const recipes: SelectedRecipe[] = [
   {
     ...base,
     recipe_id: 1,
+    verified_version: "demo-recipes-v2",
     title: "Рис с курицей и овощами",
     description:
       "Простой ужин в одной сковороде. Нежная курица и рассыпчатый рис.",
@@ -40,6 +41,7 @@ export const recipes: SelectedRecipe[] = [
       { name: "Лук", amount: "1 шт." },
       { name: "Морковь", amount: "1 шт." },
       { name: "Масло", amount: "1 ст. л." },
+      { name: "Вода", amount: "300 мл" },
     ],
     nutrition_per_100g: { kcal: 165, protein_g: 12, fat_g: 5, carbs_g: 18 },
     total_time_minutes: 25,

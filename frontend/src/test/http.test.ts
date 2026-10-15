@@ -147,6 +147,7 @@ describe("HTTP mock contract, not component fixture injection", () => {
     const made = await (
       await req("/selections", "POST", { products_text: "курица рис лук" }, c)
     ).json();
+    expect(made.items.find((item: { recipe_id: number }) => item.recipe_id === 1).missing_ingredients).toContain("Вода");
     const r = await req(
       "/selections/" + made.selection_id + "/filter",
       "POST",
@@ -181,6 +182,8 @@ describe("HTTP mock contract, not component fixture injection", () => {
         c,
       )
     ).json();
+    expect(selected.ingredients).toContainEqual({ name: "Вода", amount: "300 мл" });
+    expect(selected.verified_version).toBe("demo-recipes-v2");
     const message_id = crypto.randomUUID();
     for (let i = 0; i < 2; i++)
       expect(
@@ -200,6 +203,7 @@ describe("HTTP mock contract, not component fixture injection", () => {
       await req("/chats/demo-chat-1", "GET", undefined, c)
     ).json();
     expect(restored.selected_recipe.recipe_id).toBe(1);
+    expect(restored.selected_recipe.verified_version).toBe(selected.verified_version);
     expect(restored.selected_recipe.corpus_version).toBe("demo-corpus-v1");
     expect(
       restored.messages.filter(

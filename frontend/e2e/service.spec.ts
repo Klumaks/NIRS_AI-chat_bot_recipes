@@ -55,9 +55,12 @@ test("user flow, filters, history, repeat login and deletion", async ({
   await expect(
     page.getByRole("heading", { name: "Куриный суп с рисом", exact: true }),
   ).toHaveCount(0);
+  await expect(page.locator(".recipe-card .missing")).toContainText("Вода");
   await page.getByRole("button", { name: "Открыть рецепт" }).click();
   await expect(page).toHaveURL(/\/recipe\/1$/);
   const recipeUrl = page.url();
+  await expect(page.locator(".ingredients-panel")).toContainText("Вода");
+  await expect(page.locator(".ingredients-panel")).toContainText("300 мл");
   await expect(
     page.getByLabel("Вопрос по рецепту", { exact: true }),
   ).toBeVisible();
