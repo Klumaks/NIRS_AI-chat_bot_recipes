@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">ИИ-шеф — книга рецептов</title>
+  <desc id="desc">Раскрытая книга со скрещёнными ножом и половником. Второй вариант знака в оливковом и шалфейном цветах.</desc>
+  <g stroke="#344638" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <g id="recipe-book" fill="#F7F3E8">
+      <path d="M30 117 Q78 102 128 127 Q178 102 226 117 L226 220 Q176 207 128 232 Q80 207 30 220 Z"/>
+      <path d="M128 127 V232" fill="none"/>
+      <path d="M45 136 Q73 129 99 141 M45 156 Q66 151 85 157 M157 141 Q181 132 210 136 M170 157 Q190 151 210 156" fill="none" stroke-width="4"/>
+    </g>
+    <g id="knife">
+      <path d="M54 28 Q93 38 119 82 L99 102 Q66 81 54 28 Z" fill="#8FA58A"/>
+      <path d="M100 103 L174 184" fill="none" stroke="#F7F3E8" stroke-width="16"/>
+      <path d="M100 103 L174 184" fill="none" stroke-width="9"/>
+    </g>
+    <g id="ladle">
+      <path d="M173 80 L83 184" fill="none" stroke="#F7F3E8" stroke-width="16"/>
+      <path d="M173 80 L83 184" fill="none" stroke-width="9"/>
+      <ellipse cx="190" cy="56" rx="19" ry="29" transform="rotate(38 190 56)" fill="#8FA58A"/>
+    </g>
+  </g>
+</svg>
