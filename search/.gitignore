@@ -1,0 +1,15 @@
+# Исходный датасет и производные большие файлы — воспроизводятся скриптами
+data/raw/
+data/corpus.jsonl
+data/index_*.pkl
+benchmark/pool.csv
+
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Шаги рецептов и смещения — производные большие файлы, собираются rag.corpus
+data/steps.jsonl
+data/steps_offsets.json
