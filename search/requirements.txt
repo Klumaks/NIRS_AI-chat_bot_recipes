@@ -1,0 +1,8 @@
+# Модуль поиска (rag/) работает на чистом Python 3.10+.
+# pymorphy3 нужен для лемматизации (режим lemma, основной). Без него
+# автоматически используется встроенный стеммер Портера (режим stem).
+pymorphy3>=2.0
+pymorphy3-dicts-ru
+# pyarrow нужен только один раз — перевести parquet-файлы датасета в JSONL (rag.convert_parquet).
+pyarrow
+pytest

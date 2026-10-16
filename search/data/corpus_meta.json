@@ -1,0 +1,24 @@
+{
+  "corpus_version": "povarenok-detail-153848-20261015",
+  "source_dataset": "https://huggingface.co/datasets/d0rj/povarenok_recipes_detail",
+  "source_site": "povarenok.ru",
+  "built_at": "2026-10-15T20:18:20+00:00",
+  "records": 153848,
+  "stats": {
+    "raw": 154158,
+    "with_time": 103166,
+    "with_nutrition": 150190,
+    "with_steps": 119366,
+    "with_description": 153843,
+    "skip_few_ingredients": 77,
+    "skip_duplicate": 233,
+    "time_rejected": 6,
+    "kept": 153848
+  },
+  "rules": {
+    "min_ingredients": 2,
+    "duplicates": "одинаковые название (без регистра) и множество ингредиентов",
+    "time": "поле cooking_time в минутах; 0 или больше 43200 мин -> null",
+    "nutrition": "nae_value['100 г блюда'] — расчёт калькулятора povarenok.ru по составу; все нули или больше 900 ккал / 100 г нутриента -> null"
+  }
+}
