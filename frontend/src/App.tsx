@@ -4,6 +4,7 @@ import { queryClient } from "./lib/query";
 import { AuthProvider, Protected, useAuth } from "./auth/Auth";
 import { AppShell } from "./components/AppShell";
 import { AuthPage } from "./pages/AuthPage";
+import { RagPage } from "./pages/RagPage";
 import { ChatPage } from "./pages/ChatPage";
 import { UsersPage, ActivityPage, DiagnosticPage } from "./pages/AdminPages";
 import { Brand } from "./components/Brand";
@@ -76,6 +77,7 @@ export function App() {
                   </Protected>
                 }
               />
+              <Route path="/admin/rag" element={<Protected admin><RagPage /></Protected>} />
               <Route
                 path="/admin/activity"
                 element={

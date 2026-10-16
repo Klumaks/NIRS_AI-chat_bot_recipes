@@ -1,3 +1,4 @@
+import type { RagRecipeInput } from "../lib/rag";
 import { post, request } from "./client";
 import type {
   User,
@@ -11,6 +12,9 @@ import type {
   List,
   Activity,
   Diagnostic,
+  RagList,
+  RagValidation,
+  RagWrite,
 } from "./types";
 export const authApi = {
   me: (signal?: AbortSignal) => request<User>("/auth/me", { signal }),
@@ -44,6 +48,14 @@ export const chatApi = {
     }),
 };
 export const adminApi = {
+  rag: (offset = 0, signal?: AbortSignal) => request<RagList>(`/admin/rag?limit=20&offset=${offset}`, { signal }),
+  addRecipe: (recipe: RagRecipeInput) => post<RagWrite>("/admin/rag/recipes", recipe),
+  updateRecipe: (id: number, recipe: RagRecipeInput, expected_version: string) =>
+    request<RagWrite>(`/admin/rag/recipes/${id}`, { method: "PUT", body: JSON.stringify({ ...recipe, expected_version }) }),
+  deleteRecipe: (id: number, expected_version: string) =>
+    request<RagWrite>(`/admin/rag/recipes/${id}`, { method: "DELETE", body: JSON.stringify({ expected_version }) }),
+  validateImport: (text: string) => post<RagValidation>("/admin/rag/import/validate", { text }),
+  importRecipes: (text: string) => post<RagWrite>("/admin/rag/import", { text }),
   users: (signal?: AbortSignal) =>
     request<List<User>>("/admin/users?limit=100", { signal }),
   create: (email: string, password: string, role: Role) =>

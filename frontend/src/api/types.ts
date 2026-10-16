@@ -26,7 +26,6 @@ export interface Recipe {
   url: string;
   nutrition_per_100g: Nutrition;
   total_time_minutes: number | null;
-  difficulty: "easy" | "medium" | "hard" | null;
   missing_ingredients: string[];
   provenance: Record<
     string,
@@ -87,6 +86,9 @@ export interface Activity {
   request_id: string;
   target_user_id?: string;
   assigned_role?: Role;
+  recipe_id?: number;
+  count?: number;
+  corpus_version?: string;
 }
 export interface Diagnostic {
   request_id: string;
@@ -118,3 +120,12 @@ export interface RecipeResponse extends SelectedRecipe {
   conversation_id: string;
   request_id: string;
 }
+
+export interface RagValidation {
+  count: number;
+  errors: { line: number; message: string }[];
+  duplicates: { line: number; message: string }[];
+  valid: boolean;
+}
+export interface RagList extends List<SelectedRecipe> { corpus_version: string }
+export interface RagWrite { corpus_version: string; request_id: string; added?: number; recipe_id?: number }

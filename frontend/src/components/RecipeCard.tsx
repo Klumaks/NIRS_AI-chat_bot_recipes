@@ -1,6 +1,5 @@
 import { ArrowRight, Clock3 } from "lucide-react";
 import type { Recipe } from "../api/types";
-import { difficultyLabel } from "../lib/filters";
 export function Nutrition({ recipe }: { recipe: Recipe }) {
   const n = recipe.nutrition_per_100g;
   const v = (x: number | null) => (x == null ? "нет данных" : x);
@@ -45,7 +44,6 @@ export function RecipeCard({
             ? "Время: нет данных"
             : recipe.total_time_minutes + " мин"}
         </span>
-        <span>· {difficultyLabel(recipe.difficulty)}</span>
       </div>
       <Nutrition recipe={recipe} />
       <p className="missing">

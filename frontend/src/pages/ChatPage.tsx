@@ -16,8 +16,9 @@ import { Sage } from "../components/Brand";
 import { Loading, ErrorBox, Empty } from "../components/UI";
 import { RecipeCard, Nutrition } from "../components/RecipeCard";
 import { FilterPanel } from "../components/FilterPanel";
-import { difficultyLabel, nutritionFields } from "../lib/filters";
+import { nutritionFields } from "../lib/filters";
 import { rememberChat, forgetChat } from "../lib/lastChat";
+import { splitProducts } from "../lib/products";
 import { ApiError } from "../api/client";
 function Composer({
   placeholder,
@@ -214,6 +215,7 @@ export function ChatPage() {
           </p>
         )}
         {create.error && <ErrorBox error={create.error} onRetry={search} />}
+        <p className="muted small">Перечислите продукты через запятую или „и“</p>
         <Composer
           placeholder="Например: курица, рис и лук…"
           label="Ваши продукты"
@@ -260,8 +262,7 @@ export function ChatPage() {
       </div>
       <p className="muted">Вы написали: «{chat.products_text}»</p>
       <div className="product-chips">
-        {chat.products_text
-          .split(/[,;]+/)
+        {splitProducts(chat.products_text)
           .slice(0, 8)
           .map((s, i) => (
             <span className="chip" key={i}>
@@ -414,7 +415,6 @@ function RecipeView({
             ? "Время: нет данных"
             : r.total_time_minutes + " минут"}
         </span>
-        <span className="chip">{difficultyLabel(r.difficulty)}</span>
         <span className="chip">
           {r.nutrition_per_100g.kcal == null
             ? "нет данных"

@@ -39,7 +39,3 @@ export function matchesFilters(r: Recipe, f: Filters): boolean {
       r.total_time_minutes <= f.max_total_time_minutes)
   );
 }
-export const difficultyLabel = (v: Recipe["difficulty"]) =>
-  v == null
-    ? "нет данных"
-    : { easy: "Легко", medium: "Средне", hard: "Сложно" }[v];

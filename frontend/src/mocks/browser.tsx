@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { setupWorker } from "msw/browser";
+import { http, HttpResponse } from "msw";
+import { installMockTransport } from "./transport";
 import { handlers } from "./handlers";
 import { initializeDemo, setMode } from "./store";
 import type { DemoAccess, DemoMode } from "./store";
@@ -112,14 +114,22 @@ function DemoPanel({ access }: { access: DemoAccess[] }) {
 }
 export async function startMocks() {
   const access = await initializeDemo();
-  const worker = setupWorker(...handlers);
-  await worker.start({
+  const healthUrl = new URL("/__ai-chef-mock-health__", window.location.origin).href;
+  const worker = setupWorker(
+    http.get(healthUrl, () => HttpResponse.json({ status: "ready" }, {
+      headers: { "x-ai-chef-mock": "active", "cache-control": "no-store" },
+    })),
+    ...handlers,
+  );
+  const options: Parameters<typeof worker.start>[0] = {
     quiet: true,
     onUnhandledRequest(request, print) {
       const api = import.meta.env.VITE_API_BASE_URL || "/api/v1";
       if (new URL(request.url).pathname.startsWith(api)) print.error();
     },
-  });
+  };
+  await worker.start(options);
+  installMockTransport(worker, options, healthUrl);
   document.documentElement.dataset.demo = "true";
   createRoot(document.getElementById("demo-root")!).render(
     <DemoPanel access={access} />,
