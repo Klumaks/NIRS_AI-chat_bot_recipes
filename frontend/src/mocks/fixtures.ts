@@ -8,7 +8,6 @@ const provenance = Object.fromEntries(
     "fat_g",
     "carbs_g",
     "total_time_minutes",
-    "difficulty",
   ].map((k) => [
     k,
     {
@@ -45,7 +44,6 @@ export const recipes: SelectedRecipe[] = [
     ],
     nutrition_per_100g: { kcal: 165, protein_g: 12, fat_g: 5, carbs_g: 18 },
     total_time_minutes: 25,
-    difficulty: "easy",
     steps: [
       "Нарежьте курицу и овощи. Обжарьте на масле.",
       "Добавьте промытый рис и воду, накройте крышкой.",
@@ -67,7 +65,6 @@ export const recipes: SelectedRecipe[] = [
     ],
     nutrition_per_100g: { kcal: 85, protein_g: 6, fat_g: 3, carbs_g: 9 },
     total_time_minutes: 40,
-    difficulty: "easy",
     steps: [
       "Подготовьте курицу, крупу и овощи.",
       "Сварите курицу в воде. Добавьте рис и овощи.",
@@ -88,7 +85,6 @@ export const recipes: SelectedRecipe[] = [
     ],
     nutrition_per_100g: { kcal: 180, protein_g: 14, fat_g: 7, carbs_g: 15 },
     total_time_minutes: 35,
-    difficulty: "medium",
     steps: [
       "Отварите рис и измельчите курицу с луком.",
       "Смешайте с яйцом и сформируйте котлеты.",
@@ -108,7 +104,6 @@ export const recipes: SelectedRecipe[] = [
     ],
     nutrition_per_100g: { kcal: 135, protein_g: 9, fat_g: 9, carbs_g: 4 },
     total_time_minutes: 15,
-    difficulty: "easy",
     steps: [
       "Нарежьте помидор, взбейте яйца с молоком.",
       "Обжарьте помидор, добавьте яичную смесь.",
@@ -132,7 +127,6 @@ export const recipes: SelectedRecipe[] = [
       carbs_g: null,
     },
     total_time_minutes: null,
-    difficulty: null,
     steps: [
       "Промойте рис и приготовьте его до мягкости.",
       "Добавьте измельчённую зелень.",
@@ -150,7 +144,6 @@ export const recipes: SelectedRecipe[] = [
     ],
     nutrition_per_100g: { kcal: 140, protein_g: 3, fat_g: 5, carbs_g: 21 },
     total_time_minutes: 30,
-    difficulty: "easy",
     steps: [
       "Подготовьте картофель и лук.",
       "Обжарьте на масле и доведите до готовности.",
@@ -169,7 +162,6 @@ export const recipes: SelectedRecipe[] = [
       carbs_g: null,
     },
     total_time_minutes: null,
-    difficulty: null,
     steps: [],
   },
 ];
@@ -213,12 +205,12 @@ export function ingredientTerms(s: string): string[] {
         ].includes(w),
     );
 }
-export function candidates(query: string): SelectedRecipe[] {
+export function candidates(query: string, catalog: SelectedRecipe[] = recipes): SelectedRecipe[] {
   const q = ingredientTerms(query);
-  return recipes
+  return catalog
     .filter(
       (r) =>
-        r.recipe_id !== 7 &&
+        (r.recipe_id !== 7 || r.verified_version !== "demo-recipes-v1") &&
         r.ingredients.some((i) =>
           ingredientTerms(i.name).some((t) => q.includes(t)),
         ),

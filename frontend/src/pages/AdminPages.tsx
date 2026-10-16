@@ -28,6 +28,10 @@ const eventNames: Record<string, string> = {
   register: "Регистрация",
   create_user: "Создание аккаунта",
   delete_chat: "Удаление чата",
+  rag_add: "Добавление рецепта",
+  rag_import: "Импорт рецептов",
+  rag_update: "Редактирование рецепта",
+  rag_delete: "Удаление рецепта",
 };
 export function UsersPage() {
   const { user } = useAuth();
@@ -150,7 +154,7 @@ export function UsersPage() {
               </label>
               <label className="role-option">
                 <input type="radio" value="admin" aria-label="Администратор" {...form.register("role")} />
-                <span><strong>Администратор</strong><small>Все возможности пользователя и управление аккаунтами</small></span>
+                <span><strong>Администратор</strong><small>Все возможности пользователя, аккаунты и данные RAG</small></span>
               </label>
             </fieldset>
             {create.error && <ErrorBox error={create.error} />}
@@ -276,7 +280,9 @@ export function ActivityPage() {
                         e.user_id ||
                         "Гость"}
                     </td>
-                    <td>{eventNames[e.event_type] || e.event_type}</td>
+                    <td>{eventNames[e.event_type] || e.event_type}
+                      {e.count != null && <small className="muted"> · {e.count} записей · {e.corpus_version}{e.recipe_id != null ? ` · ID ${e.recipe_id}` : ""}</small>}
+                    </td>
                     <td>
                       <span className={"status " + e.status}>
                         {e.status === "ok" ? "Успешно" : "Ошибка"}

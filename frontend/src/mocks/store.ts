@@ -1,5 +1,5 @@
 import { openDB } from "idb";
-import type { User, Chat, Activity, Diagnostic } from "../api/types";
+import type { User, Chat, Activity, Diagnostic, SelectedRecipe } from "../api/types";
 import { candidates, recipes } from "./fixtures";
 export interface StoredUser extends User {
   salt: string;
@@ -12,6 +12,34 @@ export interface MockState {
   events: Activity[];
   diagnostics: Record<string, Diagnostic>;
   mode: DemoMode;
+  rag: { recipes: SelectedRecipe[]; revision: number; next_id: number };
+}
+export const corpusVersion = (s: MockState) => `demo-corpus-v${s.rag.revision}`;
+
+/** Upgrade the kv payload without replacing accounts, conversations or recipe snapshots. */
+function migrateState(s: MockState): MockState {
+  s.rag ??= { recipes: structuredClone(recipes), revision: 1, next_id: 8 };
+  for (const c of s.chats as OwnedChat[]) {
+    c.candidates ??= candidates(c.products_text);
+    c.demo_fixtures ??= structuredClone(recipes.filter((r) => r.recipe_id === 5 || r.recipe_id === 7));
+  }
+  if (s.rag.next_id == null) {
+    let highest = s.rag.recipes.reduce((max, r) => Math.max(max, r.recipe_id), 0);
+    for (const c of s.chats as OwnedChat[]) {
+      for (const r of [...(c.candidates ?? []), ...(c.demo_fixtures ?? []), ...c.selection.items]) highest = Math.max(highest, r.recipe_id);
+      if (c.selected_recipe) highest = Math.max(highest, c.selected_recipe.recipe_id);
+    }
+    s.rag.next_id = highest + 1;
+  }
+  // Legacy snapshots may still contain this removed API field, including provenance.
+  function removeDifficulty(value: unknown) {
+    if (!value || typeof value !== "object") return;
+    const object = value as Record<string, unknown>;
+    delete object.difficulty;
+    Object.values(object).forEach(removeDifficulty);
+  }
+  removeDifficulty(s);
+  return s;
 }
 export type DemoMode =
   | "normal"
@@ -122,13 +150,14 @@ export async function readState(): Promise<MockState> {
   const db = await dbPromise();
   const s = await db.get("kv", "state");
   if (!s) throw new Error("Demo store not initialized");
-  return s;
+  return migrateState(s);
 }
 export async function updateState<T>(fn: (s: MockState) => T): Promise<T> {
   const db = await dbPromise();
   const tx = db.transaction("kv", "readwrite");
   const s: MockState = await tx.store.get("state");
   if (!s) throw new Error("Demo store not initialized");
+  migrateState(s);
   const result = fn(s);
   await tx.store.put(s, "state");
   await tx.done;
@@ -169,6 +198,7 @@ export async function initializeDemo(reset = false): Promise<DemoAccess[]> {
       events: [],
       diagnostics: {},
       mode: "normal",
+      rag: { recipes: structuredClone(recipes), revision: 1, next_id: 8 },
     };
     // Ownership is private mock storage metadata, never a client-supplied field.
     state.chats.forEach((c, i) =>
@@ -181,7 +211,7 @@ export async function initializeDemo(reset = false): Promise<DemoAccess[]> {
     state.diagnostics["demo-request-1"] = {
       request_id: "demo-request-1",
       corpus_version: "demo-corpus-v1",
-      index_version: "demo-index-v1",
+      index_version: null,
       normalization_mode: "demo (не BM25)",
       candidate_ids: recipes.slice(0, 3).map((r) => r.recipe_id),
       selected_recipe_id: null,
@@ -210,12 +240,13 @@ export async function initializeDemo(reset = false): Promise<DemoAccess[]> {
       .concat(users);
     state.mode = "normal";
   }
+  migrateState(state);
   await tx.store.put(state, "state");
   await tx.done;
   return access;
 }
 const owners = new WeakMap<Chat, string>();
-export type OwnedChat = Chat & { owner_id: string };
+export type OwnedChat = Chat & { owner_id: string; candidates?: SelectedRecipe[]; demo_fixtures?: SelectedRecipe[] };
 export function ownerOf(c: Chat) {
   return (c as OwnedChat).owner_id;
 }

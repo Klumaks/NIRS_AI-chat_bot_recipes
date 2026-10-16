@@ -7,11 +7,14 @@ import type {
   Diagnostic,
   Activity,
   User,
+  SelectedRecipe,
 } from "../api/types";
+import { ragRecipeSchema, recipeKey, validateJsonl } from "../lib/rag";
+import type { RagRecipeInput } from "../lib/rag";
 import { API_BASE } from "../api/client";
 import { credentialsSchema, userSchema, filtersSchema } from "../lib/forms";
 import { matchesFilters, validateFilters } from "../lib/filters";
-import { candidates, recipes, ingredientTerms } from "./fixtures";
+import { candidates, ingredientTerms } from "./fixtures";
 import {
   readState,
   updateState,
@@ -22,6 +25,7 @@ import {
   now,
   ownerOf,
   seedChat,
+  corpusVersion,
 } from "./store";
 import type { MockState, StoredUser, OwnedChat } from "./store";
 class Fault extends Error {
@@ -79,7 +83,10 @@ function json<T extends object>(
 }
 async function body(req: Request): Promise<Record<string, unknown>> {
   try {
-    return await req.json();
+    const value: unknown = await req.json();
+    if (!value || typeof value !== "object" || Array.isArray(value))
+      return fail(400, "VALIDATION_ERROR", "Передайте JSON-объект.");
+    return value as Record<string, unknown>;
   } catch {
     return fail(400, "VALIDATION_ERROR", "Некорректный JSON запроса.");
   }
@@ -93,6 +100,7 @@ function event(
   selected: number | null = null,
   llm = false,
   error: string | null = null,
+  version: string = corpusVersion(s),
 ) {
   const entry: Activity = {
     occurred_at: now(),
@@ -137,8 +145,8 @@ function event(
   s.diagnostics[rid] = {
     request_id: rid,
     corpus_version:
-      type === "login" || type === "register" ? null : "demo-corpus-v1",
-    index_version: "demo-index-v1",
+      type === "login" || type === "register" ? null : version,
+    index_version: null,
     normalization_mode: "demo (не BM25)",
     candidate_ids: ids,
     selected_recipe_id: selected,
@@ -160,9 +168,10 @@ function selection(c: Chat, source: Recipe[]) {
 }
 function source(s: MockState, c: Chat) {
   if (s.mode === "empty") return [];
-  const base = candidates(c.products_text);
-  if (s.mode === "unknown") return [structuredClone(recipes[4])];
-  if (s.mode === "incomplete") return [structuredClone(recipes[6])];
+  const base = (c as OwnedChat).candidates ?? candidates(c.products_text, s.rag.recipes);
+  const demo = (c as OwnedChat).demo_fixtures ?? [];
+  if (s.mode === "unknown") return structuredClone(demo.filter((r) => r.recipe_id === 5));
+  if (s.mode === "incomplete") return structuredClone(demo.filter((r) => r.recipe_id === 7));
   return base;
 }
 type Resolver = (
@@ -170,7 +179,7 @@ type Resolver = (
   cookies: Record<string, string | undefined>,
   rid: string,
 ) => Promise<Response>;
-function route(method: "get" | "post" | "delete", path: string, fn: Resolver) {
+function route(method: "get" | "post" | "put" | "delete", path: string, fn: Resolver) {
   return http[method](API_BASE + path, async ({ request, cookies }) => {
     const rid = uid();
     await delay(120);
@@ -207,7 +216,126 @@ const resource = (req: Request, segment: string) =>
   decodeURIComponent(
     new URL(req.url).pathname.split(segment)[1]?.split("/")[0] || "",
   );
+function addRagRecords(s: MockState, records: RagRecipeInput[], u: User, rid: string, type: "rag_add" | "rag_import" | "rag_update", replaceId?: number) {
+  const nextId = replaceId ?? s.rag.next_id;
+  if (replaceId == null) s.rag.next_id += records.length;
+  s.rag.revision++;
+  const version = corpusVersion(s);
+  const added: SelectedRecipe[] = records.map((r, i) => ({
+    recipe_id: nextId + i,
+    title: r.title,
+    url: r.url,
+    ingredients: r.ingredients.map((ingredient) => ({ ...ingredient, amount: ingredient.amount ?? null })),
+    description: r.description ?? null,
+    steps: r.steps ?? [],
+    nutrition_per_100g: {
+      kcal: r.nutrition_per_100g?.kcal ?? null,
+      protein_g: r.nutrition_per_100g?.protein_g ?? null,
+      fat_g: r.nutrition_per_100g?.fat_g ?? null,
+      carbs_g: r.nutrition_per_100g?.carbs_g ?? null,
+    },
+    total_time_minutes: r.total_time_minutes ?? null,
+    corpus_version: version,
+    verified_version: `demo-recipes-v${s.rag.revision}`,
+    data_mode: "demo",
+    missing_ingredients: [],
+    provenance: Object.fromEntries(["description", "steps", "kcal", "protein_g", "fat_g", "carbs_g", "total_time_minutes"].map((key) => [key, {
+      source_ref: r.url,
+      method: "editorial",
+      checked_by: "Ввод администратора в демо — не проверенный источник",
+      checked_at: now(),
+    }])),
+  }));
+  if (replaceId == null) s.rag.recipes.push(...added);
+  else s.rag.recipes = s.rag.recipes.map((r) => r.recipe_id === replaceId ? added[0] : r);
+  event(s, u, type, rid);
+  Object.assign(s.events[s.events.length - 1], { count: added.length, corpus_version: version });
+  if (replaceId != null) s.events[s.events.length - 1].recipe_id = replaceId;
+  return { added: added.length, recipe_id: added[0].recipe_id, corpus_version: version };
+}
+function currentRagRecord(s: MockState, req: Request, b: Record<string, unknown>) {
+  const id = Number(resource(req, "/admin/rag/recipes/"));
+  const record = s.rag.recipes.find((r) => r.recipe_id === id);
+  if (!record) return fail(404, "NOT_FOUND", "Рецепт удалён или не найден. Обновите список.");
+  if (typeof b.expected_version !== "string" || !b.expected_version.trim())
+    return fail(400, "VALIDATION_ERROR", "Передайте expected_version записи.");
+  if (record.corpus_version !== b.expected_version)
+    return fail(409, "VERSION_CONFLICT", "Запись уже изменена. Обновите список и откройте актуальную запись.");
+  return record;
+}
+function importText(b: Record<string, unknown>) {
+  if (typeof b.text !== "string") fail(400, "VALIDATION_ERROR", "Передайте текст JSONL в поле text.");
+  return b.text as string;
+}
 export const handlers = [
+  route("put", "/admin/rag/recipes/:id", async (req, c, rid) => {
+    admin(await readState(), c);
+    const b = await body(req);
+    const parsed = ragRecipeSchema.safeParse(b);
+    const result = await updateState((s) => {
+      const u = admin(s, c);
+      const record = currentRagRecord(s, req, b);
+      if (!parsed.success) return fail(400, "VALIDATION_ERROR", parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; "));
+      if (s.rag.recipes.some((r) => r.recipe_id !== record.recipe_id && recipeKey(r) === recipeKey(parsed.data)))
+        return fail(409, "DUPLICATE_RECIPE", "Такой рецепт уже существует.");
+      return addRagRecords(s, [parsed.data], u, rid, "rag_update", record.recipe_id);
+    });
+    return json(result, rid);
+  }),
+  route("delete", "/admin/rag/recipes/:id", async (req, c, rid) => {
+    admin(await readState(), c);
+    const b = await body(req);
+    const result = await updateState((s) => {
+      const u = admin(s, c);
+      const record = currentRagRecord(s, req, b);
+      s.rag.recipes = s.rag.recipes.filter((r) => r.recipe_id !== record.recipe_id);
+      s.rag.revision++;
+      const version = corpusVersion(s);
+      event(s, u, "rag_delete", rid);
+      Object.assign(s.events[s.events.length - 1], { recipe_id: record.recipe_id, count: 1, corpus_version: version });
+      return { recipe_id: record.recipe_id, corpus_version: version };
+    });
+    return json(result, rid);
+  }),
+  route("get", "/admin/rag", async (req, c, rid) => {
+    const s = await readState();
+    admin(s, c);
+    const params = new URL(req.url).searchParams;
+    const limit = Math.max(1, Math.min(100, Math.trunc(Number(params.get("limit"))) || 50));
+    const offset = Math.max(0, Math.trunc(Number(params.get("offset"))) || 0);
+    return json({ items: s.rag.recipes.slice(offset, offset + limit), total: s.rag.recipes.length, corpus_version: corpusVersion(s) }, rid);
+  }),
+  route("post", "/admin/rag/recipes", async (req, c, rid) => {
+    admin(await readState(), c);
+    const parsed = ragRecipeSchema.safeParse(await body(req));
+    if (!parsed.success) fail(400, "VALIDATION_ERROR", parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; "));
+    const result = await updateState((s) => {
+      const u = admin(s, c);
+      const record = parsed.data!;
+      if (s.rag.recipes.some((r) => recipeKey(r) === recipeKey(record))) fail(409, "DUPLICATE_RECIPE", "Такой рецепт уже существует.");
+      return addRagRecords(s, [record], u, rid, "rag_add");
+    });
+    return json(result, rid, 201);
+  }),
+  route("post", "/admin/rag/import/validate", async (req, c, rid) => {
+    const s = await readState();
+    admin(s, c);
+    const text = importText(await body(req));
+    const { records: _, ...report } = validateJsonl(text, s.rag.recipes);
+    return json(report, rid);
+  }),
+  route("post", "/admin/rag/import", async (req, c, rid) => {
+    admin(await readState(), c);
+    const text = importText(await body(req));
+    const result = await updateState((s) => {
+      const u = admin(s, c);
+      const report = validateJsonl(text, s.rag.recipes);
+      if (report.errors.length) fail(400, "VALIDATION_ERROR", report.errors.map((e) => `Строка ${e.line}: ${e.message}`).join("; "));
+      if (report.duplicates.length) fail(409, "DUPLICATE_RECIPE", report.duplicates.map((e) => `Строка ${e.line}: ${e.message}`).join("; "));
+      return addRagRecords(s, report.records, u, rid, "rag_import");
+    });
+    return json(result, rid, 201);
+  }),
   route("get", "/auth/me", async (_r, c, rid) =>
     json(publicUser(user(await readState(), c)), rid),
   ),
@@ -292,7 +420,7 @@ export const handlers = [
   route("get", "/chats/:id", async (req, c, rid) => {
     const s = await readState();
     const chat = owned(s, c, (n) => n.chat_id === resource(req, "/chats/"));
-    const { owner_id: _, ...out } = chat as OwnedChat;
+    const { owner_id: _, candidates: _candidates, demo_fixtures: _demoFixtures, ...out } = chat as OwnedChat;
     return json(
       {
         ...out,
@@ -327,6 +455,8 @@ export const handlers = [
       chat.owner_id = u.user_id;
       chat.title = text;
       chat.products_text = text;
+      chat.demo_fixtures = structuredClone(s.rag.recipes.filter((r) => r.recipe_id === 5 || r.recipe_id === 7));
+      chat.candidates = candidates(text, s.rag.recipes).map((r) => ({ ...r, corpus_version: corpusVersion(s) }));
       chat.selection_id = uid();
       chat.messages = [
         { message_id: uid(), role: "user", text, created_at: now() },
@@ -342,6 +472,7 @@ export const handlers = [
         chat_id: chat.chat_id,
         selection_id: chat.selection_id,
         request_id: rid,
+        corpus_version: corpusVersion(s),
       };
       chat.selection = selection(chat, source(s, chat));
       s.chats.push(chat);
@@ -351,6 +482,7 @@ export const handlers = [
         "search",
         rid,
         chat.selection.items.map((r) => r.recipe_id),
+        null, false, null, chat.selection.corpus_version,
       );
       return chat.selection;
     });
@@ -389,6 +521,7 @@ export const handlers = [
         "filter",
         rid,
         chat.selection.items.map((r) => r.recipe_id),
+        null, false, null, chat.selection.corpus_version,
       );
       return chat.selection;
     });
@@ -404,7 +537,7 @@ export const handlers = [
       );
       const recipe = source(s, chat).find((r) => r.recipe_id === b.recipe_id);
       if (!recipe) fail(404, "NOT_FOUND", "Рецепт не найден в этом подборе.");
-      const full = recipes.find((r) => r.recipe_id === recipe!.recipe_id)!;
+      const full = recipe as SelectedRecipe;
       if (!full.steps.length)
         fail(
           409,
@@ -431,7 +564,7 @@ export const handlers = [
         recipe_id: full.recipe_id,
         conversation_id: chat.conversation_id,
       });
-      event(s, user(s, c), "select_recipe", rid, [], full.recipe_id);
+      event(s, user(s, c), "select_recipe", rid, [], full.recipe_id, false, null, chat.selection.corpus_version);
       return {
         ...chat.selected_recipe,
         chat_id: chat.chat_id,
@@ -476,6 +609,7 @@ export const handlers = [
           chat.selected_recipe?.recipe_id || null,
           true,
           "LLM_UNAVAILABLE",
+          chat.selection.corpus_version,
         );
         return null;
       }
@@ -528,7 +662,7 @@ export const handlers = [
         },
       );
       chat.updated_at = now();
-      event(s, u, "question", rid, [], recipe.recipe_id, true);
+      event(s, u, "question", rid, [], recipe.recipe_id, true, null, chat.selection.corpus_version);
       return {
         chat_id: chat.chat_id,
         message_id: b.message_id,

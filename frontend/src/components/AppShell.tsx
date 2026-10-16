@@ -9,6 +9,7 @@ import {
   MessageSquare,
   Users,
   Activity,
+  Database,
   X,
 } from "lucide-react";
 import { Brand, Sage } from "./Brand";
@@ -119,6 +120,7 @@ export function AppShell() {
                 <Users size={17} />
                 Пользователи
               </NavLink>
+              <NavLink to="/admin/rag" onClick={close}><Database size={17} />Данные RAG</NavLink>
               <NavLink to="/admin/activity" onClick={close}>
                 <Activity size={17} />
                 Активность

@@ -10,6 +10,8 @@ import {
 import { setupServer } from "msw/node";
 import { handlers } from "../mocks/handlers";
 import { initializeDemo, readState, setMode, ownerOf } from "../mocks/store";
+import { openDB } from "idb";
+import { MAX_JSONL_BYTES } from "../lib/rag";
 import type { DemoAccess } from "../mocks/store";
 const server = setupServer(...handlers);
 let access: DemoAccess[] = [];
@@ -277,5 +279,226 @@ describe("HTTP mock contract, not component fixture injection", () => {
     expect((await req("/chats/demo-chat-1", "GET", undefined, c)).status).toBe(
       200,
     );
+  });
+});
+
+const newRecipe = {
+  title: "Гречка с грибами",
+  ingredients: [{ name: "Гречка" }, { name: "Грибы", amount: "200 г" }],
+  url: "https://example.test/grechka",
+  steps: ["Сварите гречку.", "Приготовьте грибы и смешайте."],
+};
+describe("administrative demo RAG", () => {
+  it("checks all routes before parsing data for guests and users", async () => {
+    const cookie = await login();
+    for (const [path, method] of [["/admin/rag", "GET"], ["/admin/rag/recipes", "POST"], ["/admin/rag/import/validate", "POST"], ["/admin/rag/import", "POST"]]) {
+      expect((await req(path, method, method === "POST" ? {} : undefined, "chef_session=missing")).status).toBe(401);
+      expect((await req(path, method, method === "POST" ? {} : undefined, cookie)).status).toBe(403);
+    }
+  });
+  it("adds a recipe, persists it and supports search, opening, history and unknown parameters", async () => {
+    const a = await login("admin");
+    const c = await login();
+    const old = await (await req("/selections", "POST", { products_text: "гречка и грибы" }, c)).json();
+    expect(old.items).toHaveLength(0);
+    const added = await req("/admin/rag/recipes", "POST", newRecipe, a);
+    expect(added.status).toBe(201);
+    const record = await added.json();
+    expect(record.recipe_id).toBeGreaterThan(7);
+    expect(record.corpus_version).toBe("demo-corpus-v2");
+    await initializeDemo();
+    const list = await (await req("/admin/rag?limit=1&offset=7", "GET", undefined, a)).json();
+    expect(list.total).toBe(8);
+    expect(list.items).toHaveLength(1);
+    expect(list.items[0]).toMatchObject({ data_mode: "demo", total_time_minutes: null, nutrition_per_100g: { kcal: null }, ingredients: [{ name: "Гречка", amount: null }, { name: "Грибы", amount: "200 г" }] });
+    const selection = await (await req("/selections", "POST", { products_text: "ГРЕЧКА, грибы" }, c)).json();
+    expect(selection.items[0].recipe_id).toBe(record.recipe_id);
+    expect(selection.corpus_version).toBe("demo-corpus-v2");
+    const full = await (await req(`/selections/${selection.selection_id}/recipe`, "POST", { recipe_id: record.recipe_id }, c)).json();
+    expect(full.steps).toEqual(newRecipe.steps);
+    const snapshot = await (await req(`/chats/${selection.chat_id}`, "GET", undefined, c)).json();
+    expect(snapshot.selected_recipe.recipe_id).toBe(record.recipe_id);
+    expect((await req("/admin/rag/import", "POST", { text: [JSON.stringify({ ...newRecipe, title: "Вторая гречка" }), JSON.stringify({ ...newRecipe, title: "Третья гречка" })].join("\n") }, a)).status).toBe(201);
+    const restored = await (await req(`/chats/${selection.chat_id}`, "GET", undefined, c)).json();
+    expect(restored.selected_recipe).toEqual(snapshot.selected_recipe);
+    expect(restored.selection.corpus_version).toBe("demo-corpus-v2");
+    const ids = (await readState()).rag.recipes.map((r) => r.recipe_id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(snapshot).not.toHaveProperty("candidates");
+    expect(JSON.stringify(snapshot)).not.toContain('"difficulty"');
+    const filtered = await (await req(`/selections/${selection.selection_id}/filter`, "POST", { filters: { kcal: { max: 300 } } }, c)).json();
+    expect(filtered.items).toHaveLength(0);
+    const oldFiltered = await (await req(`/selections/${old.selection_id}/filter`, "POST", { filters: {} }, c)).json();
+    expect(oldFiltered.items).toHaveLength(0);
+    expect(oldFiltered.corpus_version).toBe("demo-corpus-v1");
+    const diagnostic = await (await req(`/admin/requests/${oldFiltered.request_id}`, "GET", undefined, a)).json();
+    expect(diagnostic.corpus_version).toBe("demo-corpus-v1");
+    const state = await readState();
+    const event = state.events.find((e) => e.event_type === "rag_add");
+    expect(event).toMatchObject({ user_id: "demo-admin", count: 1, corpus_version: "demo-corpus-v2" });
+    expect(JSON.stringify(state.events)).not.toContain(newRecipe.title);
+    await initializeDemo(true);
+    expect((await readState()).rag.recipes).toHaveLength(7);
+  });
+  it("validates line errors, duplicate sets and atomic imports including stale validation", async () => {
+    const a = await login("admin");
+    const text = [JSON.stringify(newRecipe), "{broken", JSON.stringify({ ...newRecipe, ingredients: [...newRecipe.ingredients].reverse(), title: newRecipe.title.toUpperCase() })].join("\n");
+    const report = await (await req("/admin/rag/import/validate", "POST", { text }, a)).json();
+    expect(report).toMatchObject({ count: 3, valid: false, errors: [{ line: 2 }], duplicates: [{ line: 3 }] });
+    expect((await readState()).rag.revision).toBe(1);
+    expect((await req("/admin/rag/import", "POST", { text }, a)).status).toBe(400);
+    expect((await readState()).rag.recipes).toHaveLength(7);
+    const clean = JSON.stringify({ ...newRecipe, id: 1, source: "example" });
+    expect((await (await req("/admin/rag/import/validate", "POST", { text: clean }, a)).json()).valid).toBe(true);
+    expect((await req("/admin/rag/import", "POST", { text: clean }, a)).status).toBe(201);
+    expect((await req("/admin/rag/import", "POST", { text: clean }, a)).status).toBe(409);
+    expect((await req("/admin/rag/recipes", "POST", newRecipe, a)).status).toBe(409);
+    expect((await readState()).rag.revision).toBe(2);
+    const page = await (await req("/admin/rag?limit=1&offset=7", "GET", undefined, a)).json();
+    expect(page.items[0].recipe_id).toBe(8);
+  });
+  it("rejects oversized, empty, excessive and invalid recipes without writes", async () => {
+    const a = await login("admin");
+    for (const text of ["", " ", "x".repeat(MAX_JSONL_BYTES + 1), Array(1001).fill(JSON.stringify(newRecipe)).join("\n")]) {
+      const report = await (await req("/admin/rag/import/validate", "POST", { text }, a)).json();
+      expect(report.valid).toBe(false);
+      expect(report.errors.length).toBeGreaterThan(0);
+      expect((await req("/admin/rag/import", "POST", { text }, a)).status).toBe(400);
+    }
+    for (const recipe of [{ ...newRecipe, url: "javascript:alert(1)" }, { ...newRecipe, ingredients: [{ name: "Гречка" }] }, { ...newRecipe, nutrition_per_100g: { kcal: -1 } }, { ...newRecipe, total_time_minutes: 1.5 }, { ...newRecipe, steps: [""] }]) {
+      expect((await req("/admin/rag/recipes", "POST", recipe, a)).status).toBe(400);
+    }
+    expect((await readState()).rag.revision).toBe(1);
+    expect((await readState()).rag.recipes).toHaveLength(7);
+  });
+  it("shows imported incomplete recipes but refuses invented steps", async () => {
+    const a = await login("admin");
+    const c = await login();
+    const { steps: _, ...incomplete } = newRecipe;
+    expect((await req("/admin/rag/import", "POST", { text: JSON.stringify(incomplete) }, a)).status).toBe(201);
+    const selection = await (await req("/selections", "POST", { products_text: "гречка" }, c)).json();
+    expect(selection.items).toHaveLength(1);
+    const response = await req(`/selections/${selection.selection_id}/recipe`, "POST", { recipe_id: 8 }, c);
+    expect(response.status).toBe(409);
+    expect((await response.json()).error).toMatchObject({ code: "RECIPE_INCOMPLETE", source_url: newRecipe.url });
+  });
+  it("migrates legacy storage without resetting users or snapshots", async () => {
+    const cookie = await login();
+    await req("/selections/selection-demo-chat-1/recipe", "POST", { recipe_id: 1 }, cookie);
+    const db = await openDB("ai-chef-demo", 1);
+    const legacy = await db.get("kv", "state");
+    delete legacy.rag;
+    legacy.chats.forEach((c: { candidates?: unknown }) => { delete c.candidates; });
+    legacy.chats[0].selected_recipe.difficulty = "easy";
+    legacy.chats[0].selected_recipe.provenance.difficulty = { source_ref: "legacy" };
+    await db.put("kv", legacy, "state");
+    await initializeDemo();
+    const restored = await (await req("/chats/demo-chat-1", "GET", undefined, cookie)).json();
+    expect(restored.selected_recipe.recipe_id).toBe(1);
+    expect(restored.messages).toHaveLength(legacy.chats[0].messages.length);
+    expect(JSON.stringify(restored)).not.toContain('"difficulty"');
+    expect((await readState()).rag.revision).toBe(1);
+  });
+  it("treats comma and standalone и equivalently and rejects only separators", async () => {
+    const c = await login();
+    const results = [];
+    for (const products_text of ["курица, рис, лук", "курица и рис и лук", " КУРИЦА, рис и лук "]) {
+      const selection = await (await req("/selections", "POST", { products_text }, c)).json();
+      results.push(selection.items);
+    }
+    expect(results[1]).toEqual(results[0]);
+    expect(results[2]).toEqual(results[0]);
+    const before = (await readState()).chats.length;
+    expect((await req("/selections", "POST", { products_text: ", и , И ," }, c)).status).toBe(400);
+    expect((await readState()).chats).toHaveLength(before);
+  });
+});
+
+
+describe("editing and deleting demo RAG recipes", () => {
+  it("authorizes both methods before validation", async () => {
+    const c = await login();
+    for (const method of ["PUT", "DELETE"]) {
+      expect((await req("/admin/rag/recipes/1", method, {}, "chef_session=missing")).status).toBe(401);
+      expect((await req("/admin/rag/recipes/1", method, {}, c)).status).toBe(403);
+    }
+  });
+  it("updates all fields, clears omitted values and rejects stale, invalid and duplicate changes atomically", async () => {
+    const a = await login("admin");
+    const original = (await readState()).rag.recipes[0];
+    const changed = { ...newRecipe, description: "Описание", nutrition_per_100g: { kcal: 100, protein_g: 3, fat_g: 2, carbs_g: 16 }, total_time_minutes: 20, expected_version: original.corpus_version };
+    const r = await req("/admin/rag/recipes/1", "PUT", changed, a);
+    expect(r.status).toBe(200);
+    expect(await r.json()).toMatchObject({ recipe_id: 1, corpus_version: "demo-corpus-v2" });
+    const edited = (await readState()).rag.recipes[0];
+    expect(edited).toMatchObject({ recipe_id: 1, title: changed.title, ingredients: [{ name: "Гречка", amount: null }, { name: "Грибы", amount: "200 г" }], description: changed.description, nutrition_per_100g: changed.nutrition_per_100g, total_time_minutes: 20, steps: changed.steps, url: changed.url, data_mode: "demo", verified_version: "demo-recipes-v2" });
+    const before = (await readState()).rag;
+    expect((await req("/admin/rag/recipes/1", "PUT", changed, a)).status).toBe(409);
+    expect((await (await req("/admin/rag/recipes/1", "DELETE", { expected_version: "demo-corpus-v1" }, a)).json()).error.code).toBe("VERSION_CONFLICT");
+    expect((await req("/admin/rag/recipes/1", "PUT", { ...changed, title: "", expected_version: edited.corpus_version }, a)).status).toBe(400);
+    const second = (await readState()).rag.recipes[1];
+    expect((await (await req("/admin/rag/recipes/1", "PUT", { ...second, expected_version: edited.corpus_version }, a)).json()).error.code).toBe("DUPLICATE_RECIPE");
+    expect((await req("/admin/rag/recipes/1", "DELETE", {}, a)).status).toBe(400);
+    expect((await readState()).rag).toEqual(before);
+    const { steps: _, ...minimal } = newRecipe;
+    expect((await req("/admin/rag/recipes/1", "PUT", { ...minimal, expected_version: edited.corpus_version }, a)).status).toBe(200);
+    const cleared = (await readState()).rag.recipes[0];
+    expect(cleared).toMatchObject({ steps: [], description: null, total_time_minutes: null, nutrition_per_100g: { kcal: null, protein_g: null, fat_g: null, carbs_g: null } });
+    const event = (await readState()).events.find((e) => e.event_type === "rag_update");
+    expect(event).toMatchObject({ recipe_id: 1, count: 1, user_id: "demo-admin", corpus_version: "demo-corpus-v2" });
+    expect(JSON.stringify((await readState()).events)).not.toContain(changed.description);
+  });
+  it("preserves old selection, recipe, answers and version across editing and deletion", async () => {
+    const a = await login("admin");
+    const c = await login();
+    const old = await (await req("/selections", "POST", { products_text: "курица и рис" }, c)).json();
+    const selected = await (await req(`/selections/${old.selection_id}/recipe`, "POST", { recipe_id: 1 }, c)).json();
+    const changed = await (await req("/admin/rag/recipes/1", "PUT", { ...newRecipe, expected_version: "demo-corpus-v1" }, a)).json();
+    const fresh = await (await req("/selections", "POST", { products_text: "гречка" }, c)).json();
+    expect(fresh.items[0]).toMatchObject({ recipe_id: 1, title: newRecipe.title });
+    expect((await req("/admin/rag/recipes/1", "DELETE", { expected_version: changed.corpus_version }, a)).status).toBe(200);
+    await initializeDemo();
+    const missing = await (await req("/selections", "POST", { products_text: "гречка" }, c)).json();
+    expect(missing.items).toEqual([]);
+    const restored = await (await req(`/chats/${old.chat_id}`, "GET", undefined, c)).json();
+    expect(restored.selected_recipe.steps).toEqual(selected.steps);
+    expect(restored.selection.corpus_version).toBe("demo-corpus-v1");
+    const filtered = await (await req(`/selections/${old.selection_id}/filter`, "POST", { filters: {} }, c)).json();
+    expect(filtered.items.some((r: { recipe_id: number }) => r.recipe_id === 1)).toBe(true);
+    const answer = await req(`/conversations/${selected.conversation_id}/messages`, "POST", { message_id: crypto.randomUUID(), text: "Второй шаг" }, c);
+    expect(answer.status).toBe(200);
+    expect((await answer.json()).answer).toBe(selected.steps[1]);
+    for (const method of ["PUT", "DELETE"]) expect((await req("/admin/rag/recipes/1", method, { ...newRecipe, expected_version: changed.corpus_version }, a)).status).toBe(404);
+    const event = (await readState()).events.find((e) => e.event_type === "rag_delete");
+    expect(event).toMatchObject({ recipe_id: 1, user_id: "demo-admin", count: 1, corpus_version: "demo-corpus-v3" });
+  });
+  it("never reuses deleted IDs, persists changes and restores all fixtures on reset", async () => {
+    const a = await login("admin");
+    const added = await (await req("/admin/rag/recipes", "POST", newRecipe, a)).json();
+    await req(`/admin/rag/recipes/${added.recipe_id}`, "DELETE", { expected_version: added.corpus_version }, a);
+    await initializeDemo();
+    const next = await (await req("/admin/rag/recipes", "POST", newRecipe, a)).json();
+    expect(next.recipe_id).toBeGreaterThan(added.recipe_id);
+    for (const r of (await readState()).rag.recipes) expect((await req(`/admin/rag/recipes/${r.recipe_id}`, "DELETE", { expected_version: r.corpus_version }, a)).status).toBe(200);
+    expect((await (await req("/admin/rag", "GET", undefined, a)).json()).total).toBe(0);
+    await initializeDemo(true);
+    expect((await readState()).rag.recipes).toHaveLength(7);
+    expect((await readState()).rag.next_id).toBe(8);
+  });
+  it("migrates the counter using retained snapshots and makes the incomplete fixture editable", async () => {
+    const a = await login("admin");
+    const c = await login();
+    const db = await openDB("ai-chef-demo", 1);
+    const state = await db.get("kv", "state");
+    delete state.rag.next_id;
+    state.chats[0].candidates.push({ ...state.rag.recipes[0], recipe_id: 100 });
+    await db.put("kv", state, "state");
+    await initializeDemo();
+    const added = await (await req("/admin/rag/recipes", "POST", newRecipe, a)).json();
+    expect(added.recipe_id).toBe(101);
+    const updated = await req("/admin/rag/recipes/7", "PUT", { ...newRecipe, title: "Новая гречка", expected_version: "demo-corpus-v1" }, a);
+    expect(updated.status).toBe(200);
+    const selection = await (await req("/selections", "POST", { products_text: "гречка" }, c)).json();
+    expect(selection.items.some((r: { recipe_id: number }) => r.recipe_id === 7)).toBe(true);
   });
 });
