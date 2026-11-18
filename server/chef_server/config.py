@@ -73,6 +73,7 @@ class Settings:
     llm_timeout_s: int = 60
     llm_temperature: float = 0.2
     llm_json_mode: bool = True               # response_format=json_object, если провайдер умеет
+    llm_reasoning_effort: str = ""           # пусто — оставить режим рассуждения провайдеру
     llm_history_messages: int = 10           # сколько последних сообщений ветки передавать
     llm_context_chars: int = 12000           # бюджет промпта; старые сообщения отбрасываются первыми
 
@@ -107,6 +108,7 @@ class Settings:
         s.llm_timeout_s = _int("CHEF_LLM_TIMEOUT_S", s.llm_timeout_s)
         s.llm_temperature = float(e("CHEF_LLM_TEMPERATURE", s.llm_temperature))
         s.llm_json_mode = _bool("CHEF_LLM_JSON_MODE", s.llm_json_mode)
+        s.llm_reasoning_effort = e("CHEF_LLM_REASONING_EFFORT", s.llm_reasoning_effort).strip()
         s.llm_history_messages = _int("CHEF_LLM_HISTORY_MESSAGES", s.llm_history_messages)
         s.llm_context_chars = _int("CHEF_LLM_CONTEXT_CHARS", s.llm_context_chars)
         if e("CHEF_FRONTEND_DIST"):

@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import httpx
-from conftest import db_dump
+from conftest import RECIPES, db_dump
 
+from chef_server.app import build_llm
+from chef_server.config import Settings
 from chef_server.llm import build_messages, parse_answer
 
 
@@ -127,6 +129,7 @@ def test_question_answer_sources_and_prompt(client_factory, fake_llm):
     req = fake_llm.requests[-1]
     assert req["headers"]["authorization"] == "Bearer secret-key"
     assert req["body"]["model"] == "test-model" and req["body"]["response_format"] == {"type": "json_object"}
+    assert "reasoning_effort" not in req["body"]
     system = req["body"]["messages"][0]["content"]
     assert "2. Обжарить 10 минут." in system and "Вода: 300 мл" in system and "не выдумывай" in system.lower()
     assert req["body"]["messages"][-1] == {"role": "user", "content": "Что делать на втором шаге?"}
@@ -144,6 +147,18 @@ def test_question_answer_sources_and_prompt(client_factory, fake_llm):
     assert roles == ["system", "user", "assistant", "user"]
     # ключ не попадает в журнал и диагностику
     assert "secret-key" not in str(api.get("/chats/" + sel["chat_id"]).json())
+
+
+def test_llm_passes_reasoning_effort_from_environment(monkeypatch, fake_llm):
+    monkeypatch.setenv("CHEF_LLM_PROVIDER", "openai_compatible")
+    monkeypatch.setenv("CHEF_LLM_BASE_URL", "http://llm.test/v1")
+    monkeypatch.setenv("CHEF_LLM_MODEL", "qwen3.5:9b")
+    monkeypatch.setenv("CHEF_LLM_REASONING_EFFORT", "none")
+    llm = build_llm(Settings.from_env())
+    monkeypatch.setattr(llm, "_transport", httpx.MockTransport(fake_llm.handler))
+
+    assert llm.answer(RECIPES[0], [], "Что делать на втором шаге?").status == "answered"
+    assert fake_llm.requests[-1]["body"]["reasoning_effort"] == "none"
 
 
 def test_llm_failure_then_retry_without_duplicate(client_factory, fake_llm, settings):

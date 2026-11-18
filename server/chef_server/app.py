@@ -39,7 +39,8 @@ def _error(request: Request, status: int, code: str, message: str, source_url: s
 
 def build_llm(s: Settings) -> LLMClient:
     return LLMClient(s.llm_provider, s.llm_base_url, s.llm_api_key, s.llm_model, s.llm_timeout_s,
-                     s.llm_temperature, s.llm_json_mode, s.llm_context_chars, s.llm_history_messages)
+                     s.llm_temperature, s.llm_json_mode, s.llm_context_chars, s.llm_history_messages,
+                     reasoning_effort=s.llm_reasoning_effort)
 
 
 def create_app(settings: Settings | None = None, search: SearchService | None = None,

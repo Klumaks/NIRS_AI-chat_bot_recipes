@@ -128,7 +128,7 @@ def parse_answer(content: str, steps_count: int) -> tuple[str, str, list[int]]:
 class LLMClient:
     def __init__(self, provider: str, base_url: str, api_key: str, model: str, timeout_s: int,
                  temperature: float, json_mode: bool, context_chars: int, history_messages: int,
-                 transport: httpx.BaseTransport | None = None):
+                 transport: httpx.BaseTransport | None = None, *, reasoning_effort: str = ""):
         self.provider = provider
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
@@ -138,6 +138,7 @@ class LLMClient:
         self.json_mode = json_mode
         self.context_chars = context_chars
         self.history_messages = history_messages
+        self.reasoning_effort = reasoning_effort
         self._transport = transport
 
     @property
@@ -152,6 +153,8 @@ class LLMClient:
         body = {"model": self.model, "messages": messages, "temperature": self.temperature}
         if json_mode:
             body["response_format"] = {"type": "json_object"}
+        if self.reasoning_effort:
+            body["reasoning_effort"] = self.reasoning_effort
         headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
         return client.post(self.base_url + "/chat/completions", json=body, headers=headers)
 

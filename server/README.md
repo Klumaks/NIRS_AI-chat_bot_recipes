@@ -30,13 +30,76 @@ PowerShell: те же команды, `Set-Location server` вместо `cd ser
 Проверка готовности без секретов: http://127.0.0.1:8000/api/v1/health (поиск, версия корпуса, режим,
 настроена ли LLM). Описание API: http://127.0.0.1:8000/api/v1/docs.
 
+## Проверка КТ2 из чистого клона
+
+1. Соберите интерфейс из корня репозитория. Для сборки используйте Node.js 20.19+ или 22.12+ и Corepack.
+
+   ```bash
+   cd frontend
+   corepack pnpm install --frozen-lockfile
+   VITE_ENABLE_MOCKS=false corepack pnpm build
+   cd ../server
+   python -m venv .venv
+   source .venv/bin/activate
+   python -m pip install -r requirements.txt
+   cp .env.example .env
+   ```
+
+   В PowerShell задайте `$env:VITE_ENABLE_MOCKS = 'false'` перед сборкой, активируйте окружение
+   командой `.\.venv\Scripts\Activate.ps1` и выполните `Copy-Item .env.example .env`.
+
+2. Запустите Ollama и выполните `ollama pull qwen3.5:9b`. Укажите в `server/.env` модель,
+   выборку из Git и отдельную БД показа.
+
+   ```dotenv
+   CHEF_LLM_PROVIDER=openai_compatible
+   CHEF_LLM_BASE_URL=http://127.0.0.1:11434/v1
+   CHEF_LLM_MODEL=qwen3.5:9b
+   CHEF_LLM_TIMEOUT_S=120
+   CHEF_LLM_REASONING_EFFORT=none
+   CHEF_CORPUS_PATH=../search/data/sample_corpus.jsonl
+   CHEF_DB_PATH=data/kt2-demo.sqlite3
+   ```
+
+3. Из `server/` создайте администратора и запустите приложение.
+
+   ```bash
+   python -m chef_server create-admin --email kt2-admin@example.test
+   python -m chef_server
+   ```
+
+   Откройте [приложение](http://127.0.0.1:8000). На странице [готовности](http://127.0.0.1:8000/api/v1/health)
+   проверьте `search.ready`, имя файла корпуса, `llm.configured` и `llm.model`.
+
+4. Войдите администратором, откройте «Данные RAG» и выберите [demo/recipes.jsonl](demo/recipes.jsonl).
+   Нажмите «Проверить файл» и «Подтвердить импорт». Появятся две записи. Для этой БД достаточно одного импорта.
+5. Выйдите, зарегистрируйте обычного пользователя и введите `огурцы, йогурт, укроп, чеснок, лимон, горчица`.
+   Откройте «Райта из огурцов с горчицей». Спросите «Сколько времени нужно выдержать посоленные огурцы
+   перед смешиванием с заправкой?» Ожидайте 10 минут и ссылку «Источник · шаг 2».
+   Затем спросите «Какая точная температура духовки указана в рецепте?» Ожидайте ответ об отсутствии
+   сведений о температуре. Через «К предложениям» откройте огуречный салат с укропом и йогуртом.
+   На первый вопрос для этого рецепта ожидайте 1 час и ссылку на источник с шагом 1.
+
+Сервер вызывает BM25 по списку продуктов, сохраняет снимок выбранного рецепта и передаёт его шаги
+локальной модели при вопросе по приготовлению. Это два пользовательских действия. В схеме семинара
+поиск запускается самим вопросом. [Протокол живого прогона](demo/verification.md).
+
+Для прогона на полном корпусе соберите `corpus.jsonl` и файлы шагов по
+[инструкции поиска](../spec/tech/rag.md#11-как-запустить), укажите `CHEF_CORPUS_PATH=../search/data/corpus.jsonl`
+и используйте отдельную БД. Ревизия исходного датасета и хеш проверенного корпуса приведены в
+[протоколе](demo/verification.md#прогон-с-полным-корпусом). Для бенчмарка возьмите корпус, к которому относится разметка.
+Из `search/` после разметки выполните `python -m benchmark.evaluate --mode lemma --rank coverage -k 3 --per-query`
+и сохраните вывод в отчёте. В этом скрипте MRR считается по первым 100 результатам.
+[Приёмка бенчмарка](../spec/tech/verification.md#benchmark-к-кт2).
+
 ## Корпус
 
 Сервер вызывает `RecipeSearcher` из `search/rag`. Если собран полный корпус `search/data/corpus.jsonl`
 (команды — [rag.md §11](../spec/tech/rag.md#11-как-запустить)), используется он; иначе — выборка
-`sample_corpus.jsonl` из Git. **В выборке нет файла шагов:** подбор и фильтры работают, а открытие рецепта
-честно возвращает `409 RECIPE_INCOMPLETE` со ссылкой на источник. Для вопросов к LLM нужен полный корпус
-со `steps.jsonl`. Полный корпус занимает ≈1,5 ГБ памяти и грузится ≈6 с (данные [rag.md](../spec/tech/rag.md)).
+`sample_corpus.jsonl` из Git. **В выборке нет файла шагов:** подбор и фильтры работают, а открытие записи
+без шагов возвращает `409 RECIPE_INCOMPLETE` со ссылкой на источник. Вопросы к LLM доступны для рецептов
+со шагами из полного корпуса или после [импорта демонстрационных записей](#проверка-кт2-из-чистого-клона).
+Полный корпус занимает ≈1,5 ГБ памяти и грузится ≈6 с (данные [rag.md](../spec/tech/rag.md)).
 
 ## Данные RAG
 
@@ -82,15 +145,24 @@ python -m chef_server rag-drop --base-key "<ключ>"
 
 Любой OpenAI-совместимый Chat Completions API. Настройки — в `server/.env` по образцу
 [.env.example](.env.example). Без LLM (`CHEF_LLM_PROVIDER=none`) работает всё, кроме вопросов по рецепту:
-они дают `503 LLM_UNAVAILABLE`, рецепт остаётся доступен. Бесплатный локальный вариант — Ollama:
+они дают `503 LLM_UNAVAILABLE`, рецепт остаётся доступен. Локальный профиль КТ2 использует Ollama:
 
 ```bash
-ollama pull qwen2.5:7b
+ollama pull qwen3.5:9b
 # server/.env
 CHEF_LLM_PROVIDER=openai_compatible
 CHEF_LLM_BASE_URL=http://127.0.0.1:11434/v1
-CHEF_LLM_MODEL=qwen2.5:7b
+CHEF_LLM_MODEL=qwen3.5:9b
+CHEF_LLM_TIMEOUT_S=120
+CHEF_LLM_REASONING_EFFORT=none
 ```
+
+Alibaba предоставляет Qwen4-Max как облачную модель. Для её подключения укажите
+`CHEF_LLM_PROVIDER=openai_compatible`, `CHEF_LLM_MODEL=qwen4-max`, URL совместимого API из настроек
+своей рабочей области и `CHEF_LLM_API_KEY` в локальном `.env`. Оставьте `CHEF_LLM_REASONING_EFFORT` пустым,
+чтобы использовать настройки Alibaba. Доступ зависит от региона рабочей области.
+[Карточка Qwen4-Max](https://www.alibabacloud.com/help/en/model-studio/qwen4-max) ·
+[Совместимый API Alibaba](https://www.alibabacloud.com/help/en/model-studio/compatibility-of-openai-with-dashscope).
 
 Промпт и разбор ответа — `chef_server/llm.py`. Модель получает только выбранный рецепт и последние
 сообщения его ветки; сервер оставляет в `step_numbers` лишь существующие номера шагов.
