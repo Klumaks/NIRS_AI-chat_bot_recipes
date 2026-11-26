@@ -1,0 +1,1305 @@
+[
+  {
+    "id": 3104,
+    "title": "Картофельные гамбургеры",
+    "categories": [
+      "Горячие блюда",
+      "Блюда из фарша",
+      "Горячие блюда из мясного фарша",
+      "Еврейская"
+    ],
+    "ingredients": [
+      {
+        "name": "Фарш мясной",
+        "amount": null
+      },
+      {
+        "name": "Приправа",
+        "amount": null
+      },
+      {
+        "name": "Зелень",
+        "amount": null
+      },
+      {
+        "name": "Картофель",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/4251/",
+    "total_time_minutes": 30,
+    "nutrition_per_100g": {
+      "kcal": null,
+      "protein_g": null,
+      "fat_g": null,
+      "carbs_g": null
+    },
+    "doc_id": "D01"
+  },
+  {
+    "id": 90772,
+    "title": "Котлеты с картошкой на углях",
+    "categories": [
+      "Горячие блюда",
+      "Блюда из фарша",
+      "Шашлык из фарша"
+    ],
+    "ingredients": [
+      {
+        "name": "Фарш мясной",
+        "amount": "800 г"
+      },
+      {
+        "name": "Соевый соус",
+        "amount": "3 ст. л."
+      },
+      {
+        "name": "Яйцо",
+        "amount": "1 шт"
+      },
+      {
+        "name": "Картофель",
+        "amount": "14 шт"
+      },
+      {
+        "name": "Специи",
+        "amount": "по вкусу"
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/108642/",
+    "total_time_minutes": null,
+    "nutrition_per_100g": {
+      "kcal": 96.9,
+      "protein_g": 1.7,
+      "fat_g": 0.3,
+      "carbs_g": 13.3
+    },
+    "doc_id": "D02"
+  },
+  {
+    "id": 345,
+    "title": "Картофельная запеканка с фаршем",
+    "categories": [
+      "Горячие блюда",
+      "Блюда из фарша",
+      "Горячие блюда из мясного фарша"
+    ],
+    "ingredients": [
+      {
+        "name": "Картофель",
+        "amount": null
+      },
+      {
+        "name": "Фарш мясной",
+        "amount": "300 г"
+      },
+      {
+        "name": "Лук репчатый",
+        "amount": "5 шт"
+      },
+      {
+        "name": "Сыр твердый",
+        "amount": null
+      },
+      {
+        "name": "Паприка сладкая",
+        "amount": null
+      },
+      {
+        "name": "Соль",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/517/",
+    "total_time_minutes": 60,
+    "nutrition_per_100g": {
+      "kcal": 73.6,
+      "protein_g": 0.8,
+      "fat_g": 0.0,
+      "carbs_g": 5.8
+    },
+    "doc_id": "D03"
+  },
+  {
+    "id": 18228,
+    "title": "Рис с курицей \"2 в 1 \"",
+    "categories": [
+      "Горячие блюда",
+      "Блюда из круп"
+    ],
+    "ingredients": [
+      {
+        "name": "Лук репчатый",
+        "amount": "1 шт"
+      },
+      {
+        "name": "Филе куриное",
+        "amount": "300 г"
+      },
+      {
+        "name": "Рис",
+        "amount": "1 стак."
+      },
+      {
+        "name": "Морковь",
+        "amount": "1 шт"
+      },
+      {
+        "name": "Приправа",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/21144/",
+    "total_time_minutes": 60,
+    "nutrition_per_100g": {
+      "kcal": 152.5,
+      "protein_g": 12.8,
+      "fat_g": 1.4,
+      "carbs_g": 21.2
+    },
+    "doc_id": "D04"
+  },
+  {
+    "id": 5359,
+    "title": "Салат куриный с рисом",
+    "categories": [
+      "Салаты",
+      "Салаты из птицы",
+      "Салаты из курицы"
+    ],
+    "ingredients": [
+      {
+        "name": "Рис",
+        "amount": "125 г"
+      },
+      {
+        "name": "Яйцо",
+        "amount": "2 шт"
+      },
+      {
+        "name": "Лук-порей",
+        "amount": null
+      },
+      {
+        "name": "Майонез",
+        "amount": null
+      },
+      {
+        "name": "Курица",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/6795/",
+    "total_time_minutes": null,
+    "nutrition_per_100g": {
+      "kcal": 222.5,
+      "protein_g": 9.9,
+      "fat_g": 6.4,
+      "carbs_g": 30.7
+    },
+    "doc_id": "D05"
+  },
+  {
+    "id": 84361,
+    "title": "Курица с рисом по-софийски",
+    "categories": [
+      "Горячие блюда",
+      "Блюда из птицы",
+      "Горячие блюда из курицы"
+    ],
+    "ingredients": [
+      {
+        "name": "Голень куриная",
+        "amount": "1 кг"
+      },
+      {
+        "name": "Рис",
+        "amount": "1,5 стак."
+      },
+      {
+        "name": "Лук репчатый",
+        "amount": "2 шт"
+      },
+      {
+        "name": "Масло сливочное",
+        "amount": "50 г"
+      },
+      {
+        "name": "Бульон",
+        "amount": "3 стак."
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/101244/",
+    "total_time_minutes": null,
+    "nutrition_per_100g": {
+      "kcal": 151.4,
+      "protein_g": 13.2,
+      "fat_g": 7.9,
+      "carbs_g": 6.9
+    },
+    "doc_id": "D06"
+  },
+  {
+    "id": 151835,
+    "title": "Борщ с запечённой свеклой",
+    "categories": [
+      "Бульоны и супы",
+      "Горячие супы",
+      "Борщ"
+    ],
+    "ingredients": [
+      {
+        "name": "Свекла",
+        "amount": "3 шт"
+      },
+      {
+        "name": "Морковь",
+        "amount": "1 шт"
+      },
+      {
+        "name": "Капуста белокочанная",
+        "amount": null
+      },
+      {
+        "name": "Свинина",
+        "amount": "500 г"
+      },
+      {
+        "name": "Картофель",
+        "amount": "4 шт"
+      },
+      {
+        "name": "Лук репчатый",
+        "amount": "2 шт"
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/178917/",
+    "total_time_minutes": 180,
+    "nutrition_per_100g": {
+      "kcal": 77.9,
+      "protein_g": 4.1,
+      "fat_g": 3.6,
+      "carbs_g": 7.5
+    },
+    "doc_id": "D07"
+  },
+  {
+    "id": 128954,
+    "title": "Постный суп-пюре из свеклы",
+    "categories": [
+      "Бульоны и супы",
+      "Горячие супы",
+      "Суп-пюре"
+    ],
+    "ingredients": [
+      {
+        "name": "Свекла",
+        "amount": "2 шт"
+      },
+      {
+        "name": "Картофель",
+        "amount": "2 шт"
+      },
+      {
+        "name": "Лук репчатый",
+        "amount": "1 шт"
+      },
+      {
+        "name": "Морковь",
+        "amount": "1 шт"
+      },
+      {
+        "name": "Капуста белокочанная",
+        "amount": null
+      },
+      {
+        "name": "Вода",
+        "amount": "1 л"
+      },
+      {
+        "name": "Сок лимонный",
+        "amount": "1 ст. л."
+      },
+      {
+        "name": "Кориандр",
+        "amount": "по вкусу"
+      },
+      {
+        "name": "Чеснок",
+        "amount": "по вкусу"
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/153083/",
+    "total_time_minutes": null,
+    "nutrition_per_100g": {
+      "kcal": 24.7,
+      "protein_g": 0.9,
+      "fat_g": 0.0,
+      "carbs_g": 5.3
+    },
+    "doc_id": "D08"
+  },
+  {
+    "id": 146830,
+    "title": "Куриный суп со свеклой и капустой",
+    "categories": [
+      "Бульоны и супы",
+      "Горячие супы",
+      "Другие супы"
+    ],
+    "ingredients": [
+      {
+        "name": "Бедро куриное",
+        "amount": "1 кг"
+      },
+      {
+        "name": "Картофель",
+        "amount": "3 шт"
+      },
+      {
+        "name": "Капуста белокочанная",
+        "amount": null
+      },
+      {
+        "name": "Свекла",
+        "amount": "600 г"
+      },
+      {
+        "name": "Лук репчатый",
+        "amount": "1 шт"
+      },
+      {
+        "name": "Морковь",
+        "amount": "1 шт"
+      },
+      {
+        "name": "Чеснок",
+        "amount": "2 зуб."
+      },
+      {
+        "name": "Томатная паста",
+        "amount": "2 ст. л."
+      },
+      {
+        "name": "Уксус",
+        "amount": "2 ст. л."
+      },
+      {
+        "name": "Масло подсолнечное",
+        "amount": "4 ст. л."
+      },
+      {
+        "name": "Рассол",
+        "amount": "150 мл"
+      },
+      {
+        "name": "Лист лавровый",
+        "amount": "1 шт"
+      },
+      {
+        "name": "Перец черный",
+        "amount": "6 шт"
+      },
+      {
+        "name": "Приправа",
+        "amount": "1 ч. л."
+      },
+      {
+        "name": "Соль",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/173537/",
+    "total_time_minutes": 80,
+    "nutrition_per_100g": {
+      "kcal": 110.2,
+      "protein_g": 8.1,
+      "fat_g": 5.6,
+      "carbs_g": 6.8
+    },
+    "doc_id": "D09"
+  },
+  {
+    "id": 88490,
+    "title": "Творожно-шоколадный десерт с бананом",
+    "categories": [
+      "Десерты",
+      "Другие десерты",
+      "Творожные десерты"
+    ],
+    "ingredients": [
+      {
+        "name": "Творог",
+        "amount": "200 г"
+      },
+      {
+        "name": "Шоколад молочный",
+        "amount": null
+      },
+      {
+        "name": "Вафли",
+        "amount": "2 шт"
+      },
+      {
+        "name": "Масло сливочное",
+        "amount": "60 г"
+      },
+      {
+        "name": "Банан",
+        "amount": "1.5 шт"
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/106039/",
+    "total_time_minutes": 40,
+    "nutrition_per_100g": {
+      "kcal": 237.9,
+      "protein_g": 7.7,
+      "fat_g": 13.6,
+      "carbs_g": 21.7
+    },
+    "doc_id": "D10"
+  },
+  {
+    "id": 95974,
+    "title": "Тарт с бананами и шоколадом",
+    "categories": [
+      "Десерты",
+      "Французская"
+    ],
+    "ingredients": [
+      {
+        "name": "Тесто слоеное",
+        "amount": "250 г"
+      },
+      {
+        "name": "Банан",
+        "amount": "3 шт"
+      },
+      {
+        "name": "Шоколад темный",
+        "amount": "200 г"
+      },
+      {
+        "name": "Сливки",
+        "amount": "300 мл"
+      },
+      {
+        "name": "Миндаль",
+        "amount": "30 г"
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/115219/",
+    "total_time_minutes": 40,
+    "nutrition_per_100g": {
+      "kcal": 272.8,
+      "protein_g": 3.6,
+      "fat_g": 18.0,
+      "carbs_g": 25.5
+    },
+    "doc_id": "D11"
+  },
+  {
+    "id": 90249,
+    "title": "Йогуртовое желе с шоколадом и бананом",
+    "categories": [
+      "Десерты",
+      "Другие десерты",
+      "Желе"
+    ],
+    "ingredients": [
+      {
+        "name": "Йогурт",
+        "amount": "600 мл"
+      },
+      {
+        "name": "Вода",
+        "amount": "200 мл"
+      },
+      {
+        "name": "Сахар коричневый",
+        "amount": "4 ст. л."
+      },
+      {
+        "name": "Желатин",
+        "amount": "8 шт"
+      },
+      {
+        "name": "Банан",
+        "amount": "1 шт"
+      },
+      {
+        "name": "Шоколад темный",
+        "amount": "100 г"
+      },
+      {
+        "name": "Молоко",
+        "amount": "50 мл"
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/108051/",
+    "total_time_minutes": 80,
+    "nutrition_per_100g": {
+      "kcal": 174.9,
+      "protein_g": 13.7,
+      "fat_g": 4.2,
+      "carbs_g": 22.9
+    },
+    "doc_id": "D12"
+  },
+  {
+    "id": 31025,
+    "title": "Гречка с тушенкой и грибами",
+    "categories": [
+      "Горячие блюда",
+      "Блюда из круп"
+    ],
+    "ingredients": [
+      {
+        "name": "Крупа гречневая",
+        "amount": "2 стак."
+      },
+      {
+        "name": "Тушенка",
+        "amount": "1 бан."
+      },
+      {
+        "name": "Шампиньоны",
+        "amount": "1 бан."
+      },
+      {
+        "name": "Соевый соус",
+        "amount": "80 мл"
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/35407/",
+    "total_time_minutes": 30,
+    "nutrition_per_100g": {
+      "kcal": 178.1,
+      "protein_g": 9.8,
+      "fat_g": 5.7,
+      "carbs_g": 23.5
+    },
+    "doc_id": "D13"
+  },
+  {
+    "id": 129518,
+    "title": "Шампиньоны с гречкой",
+    "categories": [
+      "Горячие блюда",
+      "Блюда из овощей, грибов, бобовых",
+      "Горячие блюда с грибами"
+    ],
+    "ingredients": [
+      {
+        "name": "Крупа гречневая",
+        "amount": "1 стак."
+      },
+      {
+        "name": "Вода",
+        "amount": "400 мл"
+      },
+      {
+        "name": "Шампиньоны",
+        "amount": "200 г"
+      },
+      {
+        "name": "Лук репчатый",
+        "amount": "1 шт"
+      },
+      {
+        "name": "Масло сливочное",
+        "amount": "70 г"
+      },
+      {
+        "name": "Соль",
+        "amount": "0.5 ч. л."
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/153732/",
+    "total_time_minutes": 15,
+    "nutrition_per_100g": {
+      "kcal": 135.6,
+      "protein_g": 3.8,
+      "fat_g": 6.8,
+      "carbs_g": 16.0
+    },
+    "doc_id": "D14"
+  },
+  {
+    "id": 31769,
+    "title": "Гречка с грибами",
+    "categories": [
+      "Горячие блюда",
+      "Блюда из овощей, грибов, бобовых",
+      "Горячие блюда с грибами"
+    ],
+    "ingredients": [
+      {
+        "name": "Крупа гречневая",
+        "amount": null
+      },
+      {
+        "name": "Грибы",
+        "amount": null
+      },
+      {
+        "name": "Лук репчатый",
+        "amount": null
+      },
+      {
+        "name": "Морковь",
+        "amount": null
+      },
+      {
+        "name": "Сметана",
+        "amount": null
+      },
+      {
+        "name": "Специи",
+        "amount": null
+      },
+      {
+        "name": "Зелень",
+        "amount": null
+      },
+      {
+        "name": "Соль",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/36193/",
+    "total_time_minutes": 60,
+    "nutrition_per_100g": {
+      "kcal": null,
+      "protein_g": null,
+      "fat_g": null,
+      "carbs_g": null
+    },
+    "doc_id": "D15"
+  },
+  {
+    "id": 38093,
+    "title": "\"Гнездышки\" из спагетти с ветчиной и сыром",
+    "categories": [
+      "Горячие блюда",
+      "Паста"
+    ],
+    "ingredients": [
+      {
+        "name": "Спагетти",
+        "amount": null
+      },
+      {
+        "name": "Ветчина",
+        "amount": null
+      },
+      {
+        "name": "Помидор",
+        "amount": null
+      },
+      {
+        "name": "Сыр твердый",
+        "amount": null
+      },
+      {
+        "name": "Масло растительное",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/43185/",
+    "total_time_minutes": null,
+    "nutrition_per_100g": {
+      "kcal": null,
+      "protein_g": null,
+      "fat_g": null,
+      "carbs_g": null
+    },
+    "doc_id": "D16"
+  },
+  {
+    "id": 42748,
+    "title": "Макароны пенне c ветчиной и сыром",
+    "categories": [
+      "Горячие блюда",
+      "Паста",
+      "Итальянская"
+    ],
+    "ingredients": [
+      {
+        "name": "Макаронные изделия",
+        "amount": null
+      },
+      {
+        "name": "Ветчина",
+        "amount": "150 г"
+      },
+      {
+        "name": "Перец болгарский",
+        "amount": "3 шт"
+      },
+      {
+        "name": "Сыр твердый",
+        "amount": null
+      },
+      {
+        "name": "Маслины",
+        "amount": "10 шт"
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/48530/",
+    "total_time_minutes": 30,
+    "nutrition_per_100g": {
+      "kcal": 136.3,
+      "protein_g": 5.1,
+      "fat_g": 5.6,
+      "carbs_g": 14.6
+    },
+    "doc_id": "D17"
+  },
+  {
+    "id": 1093,
+    "title": "Макароны \"Ракушки\" с ветчиной и сыром",
+    "categories": [
+      "Горячие блюда",
+      "Гарнир",
+      "Макаронные изделия"
+    ],
+    "ingredients": [
+      {
+        "name": "Макаронные изделия",
+        "amount": null
+      },
+      {
+        "name": "Ветчина",
+        "amount": "200 г"
+      },
+      {
+        "name": "Грибы",
+        "amount": "200 г"
+      },
+      {
+        "name": "Лук репчатый",
+        "amount": "1 шт"
+      },
+      {
+        "name": "Сыр твердый",
+        "amount": "150 г"
+      },
+      {
+        "name": "Зелень",
+        "amount": null
+      },
+      {
+        "name": "Соль",
+        "amount": null
+      },
+      {
+        "name": "Листья салата",
+        "amount": "Салат"
+      },
+      {
+        "name": "Масло растительное",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/1622/",
+    "total_time_minutes": 20,
+    "nutrition_per_100g": {
+      "kcal": 155.9,
+      "protein_g": 6.0,
+      "fat_g": 1.3,
+      "carbs_g": 29.4
+    },
+    "doc_id": "D18"
+  },
+  {
+    "id": 24180,
+    "title": "Пирог с яблоками",
+    "categories": [
+      "Выпечка",
+      "Изделия из теста",
+      "Пироги"
+    ],
+    "ingredients": [
+      {
+        "name": "Тесто дрожжевое",
+        "amount": null
+      },
+      {
+        "name": "Яблоко",
+        "amount": "5 шт"
+      },
+      {
+        "name": "Сахар",
+        "amount": "0,5 стак."
+      },
+      {
+        "name": "Корица",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/27666/",
+    "total_time_minutes": 60,
+    "nutrition_per_100g": {
+      "kcal": 47.0,
+      "protein_g": 0.4,
+      "fat_g": 0.4,
+      "carbs_g": 9.8
+    },
+    "doc_id": "D19"
+  },
+  {
+    "id": 37032,
+    "title": "Пирог \"Яблочный\"",
+    "categories": [
+      "Выпечка",
+      "Изделия из теста",
+      "Пироги"
+    ],
+    "ingredients": [
+      {
+        "name": "Яйцо",
+        "amount": "5 шт"
+      },
+      {
+        "name": "Сахар",
+        "amount": "250 г"
+      },
+      {
+        "name": "Мука пшеничная",
+        "amount": null
+      },
+      {
+        "name": "Яблоко",
+        "amount": "2 шт"
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/42033/",
+    "total_time_minutes": null,
+    "nutrition_per_100g": {
+      "kcal": 221.8,
+      "protein_g": 5.4,
+      "fat_g": 3.2,
+      "carbs_g": 42.7
+    },
+    "doc_id": "D20"
+  },
+  {
+    "id": 15408,
+    "title": "Быстрый яблочный пирог",
+    "categories": [
+      "Выпечка",
+      "Изделия из теста",
+      "Пироги"
+    ],
+    "ingredients": [
+      {
+        "name": "Мука пшеничная",
+        "amount": null
+      },
+      {
+        "name": "Сахар",
+        "amount": "1 стак."
+      },
+      {
+        "name": "Яйцо",
+        "amount": "3 шт"
+      },
+      {
+        "name": "Яблоко",
+        "amount": "4-5 шт"
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/18080/",
+    "total_time_minutes": null,
+    "nutrition_per_100g": {
+      "kcal": 170.6,
+      "protein_g": 3.3,
+      "fat_g": 1.9,
+      "carbs_g": 34.7
+    },
+    "doc_id": "D21"
+  },
+  {
+    "id": 4631,
+    "title": "Закуска из баклажанов",
+    "categories": [
+      "Закуски"
+    ],
+    "ingredients": [
+      {
+        "name": "Баклажан",
+        "amount": "1.2 кг"
+      },
+      {
+        "name": "Помидор",
+        "amount": "2 шт"
+      },
+      {
+        "name": "Чеснок",
+        "amount": "6 зуб."
+      },
+      {
+        "name": "Майонез",
+        "amount": null
+      },
+      {
+        "name": "Соль",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/5998/",
+    "total_time_minutes": null,
+    "nutrition_per_100g": {
+      "kcal": 34.7,
+      "protein_g": 1.1,
+      "fat_g": 0.2,
+      "carbs_g": 45.1
+    },
+    "doc_id": "D22"
+  },
+  {
+    "id": 27440,
+    "title": "Язычки из баклажанов",
+    "categories": [
+      "Закуски",
+      "Закуски из овощей"
+    ],
+    "ingredients": [
+      {
+        "name": "Баклажан",
+        "amount": "3 шт"
+      },
+      {
+        "name": "Сыр твердый",
+        "amount": "200 г"
+      },
+      {
+        "name": "Майонез",
+        "amount": null
+      },
+      {
+        "name": "Чеснок",
+        "amount": "4 зуб."
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/31373/",
+    "total_time_minutes": 60,
+    "nutrition_per_100g": {
+      "kcal": 52.6,
+      "protein_g": 4.4,
+      "fat_g": 0.9,
+      "carbs_g": 44.5
+    },
+    "doc_id": "D23"
+  },
+  {
+    "id": 130,
+    "title": "Закуска из баклажанов \"Тeщин язык\"",
+    "categories": [
+      "Закуски",
+      "Закуски из овощей"
+    ],
+    "ingredients": [
+      {
+        "name": "Баклажан",
+        "amount": null
+      },
+      {
+        "name": "Помидор",
+        "amount": null
+      },
+      {
+        "name": "Кинза",
+        "amount": null
+      },
+      {
+        "name": "Чеснок",
+        "amount": null
+      },
+      {
+        "name": "Майонез",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/207/",
+    "total_time_minutes": 45,
+    "nutrition_per_100g": {
+      "kcal": 51.5,
+      "protein_g": 1.0,
+      "fat_g": 2.8,
+      "carbs_g": 34.8
+    },
+    "doc_id": "D24"
+  },
+  {
+    "id": 15663,
+    "title": "Креветки с чесноком",
+    "categories": [
+      "Горячие блюда",
+      "Блюда из рыбы и морепродуктов",
+      "Горячие блюда из морепродуктов",
+      "Русская"
+    ],
+    "ingredients": [
+      {
+        "name": "Чеснок",
+        "amount": "2 зуб."
+      },
+      {
+        "name": "Креветки",
+        "amount": null
+      },
+      {
+        "name": "Соль",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/18351/",
+    "total_time_minutes": 20,
+    "nutrition_per_100g": {
+      "kcal": 143.0,
+      "protein_g": 6.6,
+      "fat_g": 0.6,
+      "carbs_g": 30.0
+    },
+    "doc_id": "D25"
+  },
+  {
+    "id": 86863,
+    "title": "Креветки в сметане с чесноком",
+    "categories": [
+      "Горячие блюда",
+      "Блюда из рыбы и морепродуктов",
+      "Горячие блюда из морепродуктов"
+    ],
+    "ingredients": [
+      {
+        "name": "Креветки",
+        "amount": "500 г"
+      },
+      {
+        "name": "Сметана",
+        "amount": "150 г"
+      },
+      {
+        "name": "Масло растительное",
+        "amount": null
+      },
+      {
+        "name": "Чеснок",
+        "amount": "2 зуб."
+      },
+      {
+        "name": "Зелень",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/104148/",
+    "total_time_minutes": 30,
+    "nutrition_per_100g": {
+      "kcal": 122.2,
+      "protein_g": 14.6,
+      "fat_g": 5.9,
+      "carbs_g": 2.8
+    },
+    "doc_id": "D26"
+  },
+  {
+    "id": 110710,
+    "title": "Креветки с чесноком, имбирем и лимоном",
+    "categories": [
+      "Закуски",
+      "Закуски из рыбы и морепродуктов"
+    ],
+    "ingredients": [
+      {
+        "name": "Креветки",
+        "amount": "300 г"
+      },
+      {
+        "name": "Чеснок",
+        "amount": "3 зуб."
+      },
+      {
+        "name": "Имбирь",
+        "amount": "3 ч. л."
+      },
+      {
+        "name": "Соевый соус",
+        "amount": "3 ст. л."
+      },
+      {
+        "name": "Лимон",
+        "amount": "1/2 шт"
+      },
+      {
+        "name": "Тимьян",
+        "amount": "3 шт"
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/132538/",
+    "total_time_minutes": null,
+    "nutrition_per_100g": {
+      "kcal": 77.7,
+      "protein_g": 11.0,
+      "fat_g": 1.3,
+      "carbs_g": 5.8
+    },
+    "doc_id": "D27"
+  },
+  {
+    "id": 24240,
+    "title": "Салат с кукурузой, рисом, крабовыми палочками и ананасом",
+    "categories": [
+      "Салаты"
+    ],
+    "ingredients": [
+      {
+        "name": "Кукуруза",
+        "amount": "1 бан."
+      },
+      {
+        "name": "Рис",
+        "amount": "150 г"
+      },
+      {
+        "name": "Ананас",
+        "amount": "200 г"
+      },
+      {
+        "name": "Крабовые палочки",
+        "amount": "200 г"
+      },
+      {
+        "name": "Соль",
+        "amount": null
+      },
+      {
+        "name": "Майонез",
+        "amount": null
+      },
+      {
+        "name": "Листья салата",
+        "amount": null
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/27732/",
+    "total_time_minutes": 25,
+    "nutrition_per_100g": {
+      "kcal": 181.1,
+      "protein_g": 6.2,
+      "fat_g": 2.3,
+      "carbs_g": 33.7
+    },
+    "doc_id": "D28"
+  },
+  {
+    "id": 80513,
+    "title": "Салат \"Брокколи с крабовыми палочками\"",
+    "categories": [
+      "Салаты"
+    ],
+    "ingredients": [
+      {
+        "name": "Брокколи",
+        "amount": "200 г"
+      },
+      {
+        "name": "Яйцо",
+        "amount": "5 шт"
+      },
+      {
+        "name": "Кукуруза",
+        "amount": "5 ст. л."
+      },
+      {
+        "name": "Крабовые палочки",
+        "amount": "200 г"
+      },
+      {
+        "name": "Майонез",
+        "amount": "250 г"
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/96708/",
+    "total_time_minutes": 30,
+    "nutrition_per_100g": {
+      "kcal": 247.0,
+      "protein_g": 6.5,
+      "fat_g": 19.3,
+      "carbs_g": 11.6
+    },
+    "doc_id": "D29"
+  },
+  {
+    "id": 127533,
+    "title": "Салат с крабовыми палочками и кукурузой",
+    "categories": [
+      "Салаты",
+      "Салаты из рыбы и морепродуктов",
+      "Салаты из морепродуктов"
+    ],
+    "ingredients": [
+      {
+        "name": "Крабовые палочки",
+        "amount": "300 г"
+      },
+      {
+        "name": "Лук репчатый",
+        "amount": "4 шт"
+      },
+      {
+        "name": "Яйцо",
+        "amount": "6 шт"
+      },
+      {
+        "name": "Зелень",
+        "amount": "1 пуч."
+      },
+      {
+        "name": "Кукуруза",
+        "amount": "1 бан."
+      }
+    ],
+    "source": "povarenok.ru",
+    "url": "https://www.povarenok.ru/recipes/show/151430/",
+    "total_time_minutes": 30,
+    "nutrition_per_100g": {
+      "kcal": 140.6,
+      "protein_g": 7.5,
+      "fat_g": 4.2,
+      "carbs_g": 18.2
+    },
+    "doc_id": "D30"
+  }
+]
