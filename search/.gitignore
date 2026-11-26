@@ -2,7 +2,6 @@
 data/raw/
 data/corpus.jsonl
 data/index_*.pkl
-benchmark/pool.csv
 
 __pycache__/
 *.pyc
